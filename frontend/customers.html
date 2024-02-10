@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
+</head>
+<body>
+    <div id="msg">
+        Add a new customer entry
+    </div>
+    Name<input id="customername">
+    City<input id="city">
+    Age<input id="age">
+    <button onclick="add()">Add</button>
+    <div id="display"></div>
+
+    <script>
+        const SERVER = "http://127.0.0.1:5000/customers"
+        
+        let arr=[]
+
+        const getData=async()=>
+        {
+        res =await axios.get(SERVER)
+        arr=res.data
+        console.table(arr)
+        buildGUI()
+        }
+
+        const add =()=>
+        {
+            axios.post(SERVER + "/new",
+            {name:customername.value,
+                city:city.value,
+                age:age.value}).then(res =>msg.innerHTML = "Customer Entry Added")
+        }
+
+        const del =(id)=>
+        {
+            axios.delete(SERVER + "/del/"+id).then(res =>msg.innerHTML = "Customer entry Deleted")
+        }
+
+        const update =(id)=>
+        {
+            axios.put(SERVER + "/upd/"+id,
+            {name:customername.value,
+                city:city.value,
+                age:age.value}).then(res =>msg.innerHTML = "Entry Updated")
+        }
+        
+        const buildGUI=()=>
+        {
+            display.innerHTML = arr.map(customer =>
+             `<div>
+                Name:${customer.name} 
+                City:${customer.city} 
+                Age:${customer.age} 
+                <button onclick='del(${customer.id})'>Delete</button>
+                <button onclick='update(${customer.id})'>Update</button>
+                </div>` ).join("")
+        }
+        
+        getData()
+    </script>
+</body>
+</html>

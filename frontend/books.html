@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
+</head>
+<body>
+    <div id="msg">
+        Add a new book entry
+    </div>
+    Name<input id="bookname">
+    Author<input id="author">
+    Year Published<input id="year_published">
+    Type<select name="type" id="type">
+        <option value="Type1">Type1</option>
+        <option value="Type2">Type2</option>
+        <option value="Type3">Type3</option>
+      </select>
+    <button onclick="add()">Add</button>
+    <div id="display"></div>
+
+    <script>
+        const SERVER = "http://127.0.0.1:5000/books"
+        
+        let arr=[]
+
+        const getData=async()=>
+        {
+        res =await axios.get(SERVER)
+        arr=res.data
+        console.table(arr)
+        buildGUI()
+        }
+
+        const add =()=>
+        {
+            axios.post(SERVER + "/new",
+            {name:bookname.value,
+                author:author.value,
+                year_published:year_published.value,
+                type:type.value}).then(res =>msg.innerHTML = "Book entry Added")
+        }
+
+        const del =(id)=>
+        {
+            axios.delete(SERVER + "/del/"+id).then(res =>msg.innerHTML = "Book entry Deleted")
+        }
+
+        const update =(id)=>
+        {
+            axios.put(SERVER + "/upd/"+id,{name:bookname.value,
+                author:author.value,
+                year_published:year_published.value,
+                type:type.value}).then(res =>msg.innerHTML = "Book entry Updated")
+        }
+        
+        const buildGUI=()=>
+        {
+            display.innerHTML = arr.map(book =>
+             `<div>
+                Name:${book.name} 
+                Author:${book.author} 
+                Year Published:${book.year_published} 
+                Type:${book.type}
+                <button onclick='del(${book.id})'>Delete</button>
+                <button onclick='update(${book.id})'>Update</button>
+                </div>` ).join("")
+        }
+        
+        getData()
+    </script>
+</body>
+</html>

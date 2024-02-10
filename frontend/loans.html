@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
+</head>
+<body>
+    <div id="msg">
+        Add a new loan entry
+    </div>
+    Book Name<select id="book_id"></select>
+    Customer Name<select id="customer_id"></select>
+    Loan Date<input type="date" id="loan_date">
+    Return Date<input type="date" id="return_date">
+    <button onclick="add()">Add</button>
+    <div id="display"></div>
+
+    <button onclick ="getcustomerData()">check</button>
+
+    <script>
+        const SERVER = "http://127.0.0.1:5000/loans"
+        const booksdb = "http://127.0.0.1:5000/books"
+        const customersdb = "http://127.0.0.1:5000/customers"
+        let arr =[]
+        let bookarr=[]
+        let customersarr=[]
+
+        const getData=async()=>
+        {
+        res =await axios.get(SERVER)
+        arr=res.data
+        console.table(arr)
+        buildGUI()
+        }
+
+
+        const getbookData = async () => {
+        try {
+            const res = await axios.get(booksdb);
+            bookarr = res.data;
+            console.table(bookarr);
+
+            // Populate the select element with book IDs and names
+            const bookid_sel = document.getElementById("book_id");
+            bookarr.forEach(book => {
+            const option = document.createElement("option"); // Use "option" for select elements
+            option.value = book.id; // Set the option's value to the book ID
+            option.text = book.name; // Set the option's text to the book name
+            console.log(option)
+            bookid_sel.appendChild(option); // Append the option to the select element
+            });
+            }
+            catch (error) 
+            {
+                console.error("Error fetching book data:", error);
+            }
+        };
+
+        const getcustomerData = async () => {
+        try {
+            const res = await axios.get(customersdb);
+            customersarr = res.data;
+            console.table(customersarr);
+
+            // Populate the select element with book IDs and names
+            const customerid_sel = document.getElementById("customer_id");
+            customersarr.forEach(customer => {
+            const option = document.createElement("option"); // Use "option" for select elements
+            option.value = customer.id; // Set the option's value to the customer ID
+            option.text = customer.name; // Set the option's text to the customer name
+            console.log(option)
+            customerid_sel.appendChild(option); // Append the option to the select element
+            });
+            }
+            catch (error) 
+            {
+                console.error("Error fetching customer data:", error);
+            }
+        };
+
+        window.onload = Promise.all([getbookData(), getcustomerData()]);
+
+
+        const add =()=>
+        {
+            axios.post(SERVER + "/new",
+            {book_id:book_id.value,
+                customer_id:customer_id.value,
+                loan_date:loan_date.value,
+                return_date:return_date.value}).then(res =>msg.innerHTML = "Loan Entry Added")
+        }
+
+
+        const del =(id)=>
+        {
+            axios.delete(SERVER + "/del/"+id).then(res =>msg.innerHTML = "Loan entry Deleted")
+        }
+
+        const update =(id)=>
+        {
+            axios.put(SERVER + "/upd/"+id,
+            {book_id:book_id.value,
+                customer_id:customer_id.value,
+                loan_date:loan_date.value,
+                return_date:return_date.value}).then(res =>msg.innerHTML = "Loan entry Updated")
+        }
+        
+        const buildGUI=()=>
+        {
+            display.innerHTML = arr.map(loan =>
+             `<div>
+                Book ID:${loan.book_id} 
+                Customer ID:${loan.customer_id} 
+                Loan Date:${loan.loan_date} 
+                Return Date:${loan.return_date}
+                <button onclick='del(${loan.id})'>Delete</button>
+                <button onclick='update(${loan.id})'>Update</button>
+                </div>` ).join("")
+        }
+        
+        getData()
+    </script>
+</body>
+</html>

@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Books</title>
     <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
 </head>
 <body>
     <div id="msg">
-        Add a new book entry
+        <h2>Add a new book entry</h2>
     </div>
     Name<input id="bookname">
     Author<input id="author">
@@ -20,6 +20,17 @@
       </select>
     <button onclick="add()">Add</button>
     <div id="display"></div>
+
+    <div>
+        Search<input id="searchbar">
+        <button onclick="searchEntry()">Search</button>
+        <div id="searchres">
+        </div>
+        </div>
+
+    <div id="totalbooks"></div>
+
+    <a href ="homepage.html">Back to Homepage</a>
 
     <script>
         const SERVER = "http://127.0.0.1:5000/books"
@@ -58,18 +69,45 @@
         
         const buildGUI=()=>
         {
+            var booknum = arr.length 
             display.innerHTML = arr.map(book =>
              `<div>
                 Name:${book.name} 
                 Author:${book.author} 
                 Year Published:${book.year_published} 
                 Type:${book.type}
-                <button onclick='del(${book.id})'>Delete</button>
-                <button onclick='update(${book.id})'>Update</button>
+                <button onclick='del(${book.id})'>Delete Book Entry</button>
+                <button onclick='update(${book.id})'>Update Book Entry</button>
                 </div>` ).join("")
+                totalbooks.innerHTML = `<h2>Total number of books available: ${booknum}</h2>`
         }
         
         getData()
+
+        const searchEntry = async () => {
+        try {
+            const res = await axios.get(SERVER);
+            const arr = res.data;
+
+            const searchTerm = searchbar.value;
+
+            const foundBook = arr.find((item) => item.name === searchTerm);
+
+            if (foundBook) {
+                searchres.innerHTML = `Book Found! Book ID: ${foundBook.id}`;
+            } 
+            else
+            {
+                searchres.innerHTML = `Book Not Found!`;
+            }
+            } 
+        catch (error) 
+            {
+                console.error("Error during search:", error);
+                searchres.innerHTML = `An error occurred. Please try again later.`;
+            }
+        };
+        
     </script>
 </body>
 </html>

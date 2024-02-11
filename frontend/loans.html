@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Loans</title>
     <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
 </head>
 <body>
@@ -14,10 +14,13 @@
     Customer Name<select id="customer_id"></select>
     Loan Date<input type="date" id="loan_date">
     Return Date<input type="date" id="return_date">
+
+    <span id="book_type">Book Type:</span>
+    <span id="loan_status">Loan Status:</span>
+    
     <button onclick="add()">Add</button>
     <div id="display"></div>
 
-    <button onclick ="getcustomerData()">check</button>
 
     <script>
         const SERVER = "http://127.0.0.1:5000/loans"
@@ -58,6 +61,7 @@
             }
         };
 
+
         const getcustomerData = async () => {
         try {
             const res = await axios.get(customersdb);
@@ -79,6 +83,7 @@
                 console.error("Error fetching customer data:", error);
             }
         };
+
 
         window.onload = Promise.all([getbookData(), getcustomerData()]);
 
@@ -120,7 +125,11 @@
                 </div>` ).join("")
         }
         
+
+
         getData()
+
+
     </script>
 </body>
 </html>

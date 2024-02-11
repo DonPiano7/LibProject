@@ -3,18 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Customers</title>
     <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
 </head>
 <body>
     <div id="msg">
-        Add a new customer entry
+        <h2>Add a new customer entry</h2>
     </div>
     Name<input id="customername">
     City<input id="city">
     Age<input id="age">
     <button onclick="add()">Add</button>
     <div id="display"></div>
+
+    <div>
+    Search<input id="searchbar">
+    <button onclick="searchEntry()">Search</button>
+    <div id="searchres">
+    </div>
+    </div>
+
+    <div id="totalcust"></div>
+
+    <a href ="homepage.html">Back to Homepage</a>
 
     <script>
         const SERVER = "http://127.0.0.1:5000/customers"
@@ -52,15 +63,41 @@
         
         const buildGUI=()=>
         {
+            var custnum = arr.length 
             display.innerHTML = arr.map(customer =>
              `<div>
-                Name:${customer.name} 
-                City:${customer.city} 
-                Age:${customer.age} 
-                <button onclick='del(${customer.id})'>Delete</button>
-                <button onclick='update(${customer.id})'>Update</button>
+                Name:${customer.name}
+                City:${customer.city}
+                Age:${customer.age}
+                <button onclick='del(${customer.id})'>Delete Customer Entry</button>
+                <button onclick='update(${customer.id})'>Update Customer Entry</button>
                 </div>` ).join("")
+                totalcust.innerHTML = `<h2>Total number of active customers: ${custnum}</h2>`
         }
+
+        const searchEntry = async () => {
+        try {
+            const res = await axios.get(SERVER);
+            const arr = res.data;
+
+            const searchTerm = searchbar.value;
+
+            const foundBook = arr.find((item) => item.name === searchTerm);
+
+            if (foundBook) {
+                searchres.innerHTML = `Customer Found! Customer ID: ${foundBook.id}`;
+            } 
+            else
+            {
+                searchres.innerHTML = `Customer Not Found!`;
+            }
+            } 
+        catch (error) 
+            {
+                console.error("Error during search:", error);
+                searchres.innerHTML = `An error occurred. Please try again later.`; 
+            }
+        };
         
         getData()
     </script>
